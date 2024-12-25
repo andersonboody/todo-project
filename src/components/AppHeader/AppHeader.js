@@ -1,23 +1,22 @@
-import React, { Component } from "react";
-import NewTaskForm from "../NewTaskForm/NewTaskForm";
-import "./AppHeader.css"
-import propTypes from "prop-types";
+import React, { Component } from 'react'
+import './AppHeader.css'
+import propTypes from 'prop-types'
+
+import NewTaskForm from '../NewTaskForm/NewTaskForm'
 
 export default class AppHeader extends Component {
-  
   static propTypes = {
-    onAddTask: propTypes.func
+    onAddTask: propTypes.func,
   }
   static defaultProps = {
-    onAddTask: () => {}
+    onAddTask: () => {},
   }
-
   render() {
     return (
       <header>
         <h1>todos</h1>
-        <NewTaskForm onAddTask={this.props.onAddTask}/>
+        <NewTaskForm onAddTask={this.props.onAddTask} />
       </header>
-    )    
+    )
   }
 }

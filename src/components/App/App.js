@@ -1,18 +1,18 @@
 import React, { Component } from 'react'
-import './App.css'
-import AppHeader from '../AppHeader/AppHeader';
-import TaskList from '../TaskList/TaskList';
-import Footer from '../Footer/Footer';
 
+import './App.css'
+import AppHeader from '../AppHeader/AppHeader'
+import TaskList from '../TaskList/TaskList'
+import Footer from '../Footer/Footer'
 
 export default class App extends Component {
-  newID = 0
+  newId = 0
   createTodoItem(label) {
     return {
       label,
       completed: false,
-      id: this.newID++,
-      createDate: new Date()
+      id: this.newId++,
+      createDate: new Date(),
     }
   }
 
@@ -20,34 +20,34 @@ export default class App extends Component {
     super()
     this.state = {
       todoData: [],
-      filter: 'all'
+      filter: 'all',
     }
     this.deleteItem = (id) => {
       this.setState(({ todoData }) => {
         const newTodoData = todoData.filter((elem) => elem.id !== id)
         return {
-          todoData: newTodoData
+          todoData: newTodoData,
         }
       })
     }
     this.completedItem = (id) => {
       this.setState(({ todoData }) => {
         const newTodoData = todoData.map((elem) => {
-          if(elem.id === id) {
-            return {...elem, completed: !elem.completed}
+          if (elem.id === id) {
+            return { ...elem, completed: !elem.completed }
           }
           return elem
         })
         return {
-          todoData: newTodoData
+          todoData: newTodoData,
         }
       })
     }
     this.deleteAll = () => {
       this.setState(({ todoData }) => {
-        const newTodoData = todoData.filter(elem => !elem.completed)
+        const newTodoData = todoData.filter((elem) => !elem.completed)
         return {
-          todoData: newTodoData
+          todoData: newTodoData,
         }
       })
     }
@@ -56,25 +56,25 @@ export default class App extends Component {
       this.setState(({ todoData }) => {
         const newArr = [...todoData, newTask]
         return {
-          todoData: newArr
+          todoData: newArr,
         }
       })
     }
     this.FilterTask = (filter) => {
-      this.setState({ 
-        filter 
+      this.setState({
+        filter,
       })
     }
     this.editTask = (id, newLabel) => {
       this.setState(({ todoData }) => {
         const newTodoData = todoData.map((elem) => {
-          if(elem.id === id) {
-            return {...elem, label: newLabel}
+          if (elem.id === id) {
+            return { ...elem, label: newLabel }
           }
           return elem
         })
         return {
-          todoData: newTodoData
+          todoData: newTodoData,
         }
       })
     }
@@ -83,12 +83,12 @@ export default class App extends Component {
   render() {
     const { todoData, filter } = this.state
 
-    const countUnfinishedTask = todoData.filter(elem => !elem.completed).length
+    const countUnfinishedTask = todoData.filter((elem) => !elem.completed).length
     const filterTask = todoData.filter((elem) => {
-      switch(filter) {
-        case 'active' :
+      switch (filter) {
+        case 'active':
           return !elem.completed
-        case 'completed' :
+        case 'completed':
           return elem.completed
         default:
           return true
@@ -98,16 +98,18 @@ export default class App extends Component {
     return (
       <section className="todoApp">
         <AppHeader onAddTask={this.newAddTask} />
-        <TaskList 
+        <TaskList
           todos={filterTask}
           onDeleted={this.deleteItem}
           onCompleted={this.completedItem}
-          onEditTask={this.editTask} />
+          onEditTask={this.editTask}
+        />
         <Footer
           onDeletedAll={this.deleteAll}
           countTasks={countUnfinishedTask}
           filter={filter}
-          onFilterTask={this.FilterTask} />
+          onFilterTask={this.FilterTask}
+        />
       </section>
     )
   }
