@@ -73,7 +73,7 @@ export default class TaskList extends Component {
     const { editTaskId, editLabel } = this.state
 
     const elements = todos.map((item) => {
-      const { id, label, createDate, completed } = item
+      const { id, label, createDate, completed, timer } = item
 
       let classNames = ''
       if (completed) classNames = 'completed'
@@ -97,6 +97,7 @@ export default class TaskList extends Component {
               onDeleted={() => onDeleted(id)}
               onCompleted={() => onCompleted(id)}
               onEditTask={() => this.startEditingTask(id, label)}
+              timer={timer}
             />
           )}
         </li>

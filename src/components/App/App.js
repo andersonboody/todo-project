@@ -13,6 +13,7 @@ export default class App extends Component {
       completed: false,
       id: this.newId++,
       createDate: new Date(),
+      timer: 0,
     }
   }
 
