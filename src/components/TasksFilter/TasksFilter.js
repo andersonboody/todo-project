@@ -4,14 +4,13 @@ import propTypes from 'prop-types'
 
 export default class TasksFilter extends Component {
   static propTypes = {
-    filter: propTypes.func,
+    filter: propTypes.string,
     onFilterTask: propTypes.func,
   }
   static defaultProps = {
-    filter: () => {},
+    filter: '',
     onFilterTask: () => {},
   }
-
   render() {
     const { filter, onFilterTask } = this.props
     return (

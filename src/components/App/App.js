@@ -7,92 +7,99 @@ import Footer from '../Footer/Footer'
 
 export default class App extends Component {
   newId = 0
-  createTodoItem(label) {
+
+  state = {
+    todoData: [],
+    filter: 'all',
+  }
+
+  createTodoItem(label, min, sec) {
     return {
       label,
-      completed: false,
+      min,
+      sec,
+      completed: 'active',
       id: this.newId++,
       createDate: new Date(),
-      timer: 0,
+      show: 'list-item',
     }
   }
 
-  constructor() {
-    super()
-    this.state = {
-      todoData: [],
-      filter: 'all',
-    }
-    this.deleteItem = (id) => {
-      this.setState(({ todoData }) => {
-        const newTodoData = todoData.filter((elem) => elem.id !== id)
-        return {
-          todoData: newTodoData,
-        }
-      })
-    }
-    this.completedItem = (id) => {
-      this.setState(({ todoData }) => {
-        const newTodoData = todoData.map((elem) => {
-          if (elem.id === id) {
-            return { ...elem, completed: !elem.completed }
+  deleteItem = (id) => {
+    this.setState(({ todoData }) => {
+      const newTodoData = todoData.filter((elem) => elem.id !== id)
+      return {
+        todoData: newTodoData,
+      }
+    })
+  }
+
+  completedItem = (id) => {
+    this.setState(({ todoData }) => {
+      const newTodoData = todoData.map((elem) => {
+        if (elem.id === id) {
+          if (elem.completed === 'active') {
+            return { ...elem, completed: 'completed' }
           }
-          return elem
-        })
-        return {
-          todoData: newTodoData,
+          return { ...elem, completed: 'active' }
         }
+        return elem
       })
-    }
-    this.deleteAll = () => {
-      this.setState(({ todoData }) => {
-        const newTodoData = todoData.filter((elem) => !elem.completed)
-        return {
-          todoData: newTodoData,
+      return {
+        todoData: newTodoData,
+      }
+    })
+  }
+
+  deleteAll = () => {
+    this.setState(({ todoData }) => {
+      const newTodoData = todoData.filter((elem) => elem.completed === 'active')
+      return {
+        todoData: newTodoData,
+      }
+    })
+  }
+
+  newAddTask = (label, min, sec) => {
+    const newTask = this.createTodoItem(label, min, sec)
+    this.setState(({ todoData }) => {
+      const newArr = [...todoData, newTask]
+      return {
+        todoData: newArr,
+      }
+    })
+  }
+
+  editTask = (id, newLabel) => {
+    this.setState(({ todoData }) => {
+      const newTodoData = todoData.map((elem) => {
+        if (elem.id === id) {
+          return { ...elem, label: newLabel }
         }
+        return elem
       })
-    }
-    this.newAddTask = (label) => {
-      const newTask = this.createTodoItem(label)
-      this.setState(({ todoData }) => {
-        const newArr = [...todoData, newTask]
-        return {
-          todoData: newArr,
-        }
-      })
-    }
-    this.FilterTask = (filter) => {
-      this.setState({
-        filter,
-      })
-    }
-    this.editTask = (id, newLabel) => {
-      this.setState(({ todoData }) => {
-        const newTodoData = todoData.map((elem) => {
-          if (elem.id === id) {
-            return { ...elem, label: newLabel }
-          }
-          return elem
-        })
-        return {
-          todoData: newTodoData,
-        }
-      })
-    }
+      return {
+        todoData: newTodoData,
+      }
+    })
+  }
+  filterTask = (meaning) => {
+    this.setState({ filter: meaning })
   }
 
   render() {
     const { todoData, filter } = this.state
 
-    const countUnfinishedTask = todoData.filter((elem) => !elem.completed).length
-    const filterTask = todoData.filter((elem) => {
-      switch (filter) {
-        case 'active':
-          return !elem.completed
-        case 'completed':
-          return elem.completed
-        default:
-          return true
+    const countUnfinishedTask = todoData.filter((elem) => elem.completed === 'active').length
+    const todoDataFilter = todoData.map((elem) => {
+      if (filter === 'all') {
+        return { ...elem, show: 'list-item' }
+      } else if (filter === 'active' && elem.completed === 'active') {
+        return { ...elem, show: 'list-item' }
+      } else if (filter === 'completed' && elem.completed === 'completed') {
+        return { ...elem, show: 'list-item' }
+      } else {
+        return { ...elem, show: 'hidden' }
       }
     })
 
@@ -100,7 +107,7 @@ export default class App extends Component {
       <section className="todoApp">
         <AppHeader onAddTask={this.newAddTask} />
         <TaskList
-          todos={filterTask}
+          todos={todoDataFilter}
           onDeleted={this.deleteItem}
           onCompleted={this.completedItem}
           onEditTask={this.editTask}
@@ -109,7 +116,7 @@ export default class App extends Component {
           onDeletedAll={this.deleteAll}
           countTasks={countUnfinishedTask}
           filter={filter}
-          onFilterTask={this.FilterTask}
+          onFilterTask={this.filterTask}
         />
       </section>
     )

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import './Task.css'
-import { formatDistanceToNow, format, addSeconds } from 'date-fns'
+import { formatDistanceToNow, format } from 'date-fns'
 import { enUS } from 'date-fns/locale'
 import propTypes from 'prop-types'
 
@@ -20,17 +20,17 @@ export default class Task extends Component {
     onDeleted: () => {},
     onEditTask: () => {},
   }
-  constructor(props) {
-    super(props)
 
-    this.state = {
-      seconds: this.props.timer,
-      timerActive: false,
-    }
+  state = {
+    min: this.props.min,
+    sec: this.props.sec,
+    timerActive: false,
   }
+
   componentWillUnmount() {
     this.stopTimer()
   }
+
   startTimer = () => {
     if (!this.state.timerActive) {
       this.setState({
@@ -38,23 +38,36 @@ export default class Task extends Component {
       })
       this.intervalId = setInterval(() => {
         this.setState((prevState) => {
+          if (prevState.min <= 0 && prevState.sec <= 0) {
+            clearInterval(this.intervalId)
+            return {
+              min: 0,
+              sec: 0,
+            }
+          }
+          if (prevState.sec === 0) {
+            return {
+              min: prevState.min - 1,
+              sec: 59,
+            }
+          }
           return {
-            seconds: prevState.seconds + 1,
+            sec: prevState.sec - 1,
           }
         })
       }, 1000)
     }
   }
+
   stopTimer = () => {
-    if (this.state.timerActive) {
-      clearInterval(this.intervalId)
-      this.setState({ timerActive: false })
-    }
+    this.setState({ timerActive: false })
+    clearInterval(this.intervalId)
   }
 
   render() {
     const { label, createDate, onCompleted, onDeleted, onEditTask } = this.props
-    const formattedTime = format(addSeconds(new Date(0), this.state.seconds), 'mm:ss')
+    const { min, sec } = this.state
+    const formattedTime = format(new Date(0, 0, 0, 0, min, sec), 'mm:ss')
     return (
       <div className="view">
         <input type="checkbox" className="toggle" onClick={onCompleted} />

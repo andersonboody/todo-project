@@ -9,21 +9,11 @@ export default class TaskList extends Component {
     todos: propTypes.array,
     onDeleted: propTypes.func,
     onCompleted: propTypes.func,
-    onEditTask: propTypes.func,
-    id: propTypes.number,
-    label: propTypes.string,
-    createDate: propTypes.object,
-    completed: propTypes.bool,
   }
   static defaultProps = {
     todos: [],
     onDeleted: () => {},
     onCompleted: () => {},
-    onEditTask: () => {},
-    id: 0,
-    label: '',
-    createDate: {},
-    completed: false,
   }
 
   constructor() {
@@ -73,10 +63,11 @@ export default class TaskList extends Component {
     const { editTaskId, editLabel } = this.state
 
     const elements = todos.map((item) => {
-      const { id, label, createDate, completed, timer } = item
+      const { id, label, min, sec, createDate, completed, show } = item
 
       let classNames = ''
-      if (completed) classNames = 'completed'
+      if (completed === 'completed') classNames = 'completed'
+      if (show === 'hidden') classNames = 'show'
 
       const isEdit = editTaskId === id
       return (
@@ -93,11 +84,12 @@ export default class TaskList extends Component {
           ) : (
             <Task
               label={label}
+              min={min}
+              sec={sec}
               createDate={createDate}
               onDeleted={() => onDeleted(id)}
               onCompleted={() => onCompleted(id)}
               onEditTask={() => this.startEditingTask(id, label)}
-              timer={timer}
             />
           )}
         </li>
