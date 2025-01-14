@@ -57,7 +57,7 @@ export default class App extends Component {
 
   deleteAll = () => {
     this.setState(({ todoData }) => {
-      const newTodoData = todoData.filter((elem) => elem.completed === 'active')
+      const newTodoData = todoData.filter((elem) => !elem.completed)
       return {
         todoData: newTodoData,
       }
