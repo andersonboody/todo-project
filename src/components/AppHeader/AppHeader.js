@@ -12,10 +12,11 @@ export default class AppHeader extends Component {
     onAddTask: () => {},
   }
   render() {
+    const { onCreateTask } = this.props
     return (
       <header>
         <h1>todos</h1>
-        <NewTaskForm onAddTask={this.props.onAddTask} />
+        <NewTaskForm onCreateTask={onCreateTask} />
       </header>
     )
   }

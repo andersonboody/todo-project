@@ -2,6 +2,7 @@ import React, { Component, createRef } from 'react'
 import './TaskList.css'
 import propTypes from 'prop-types'
 
+import { TimerConsumer } from '../AppContext/AppContext'
 import Task from '../Task/Task'
 
 export default class TaskList extends Component {
@@ -16,46 +17,40 @@ export default class TaskList extends Component {
     onCompleted: () => {},
   }
 
-  constructor() {
-    super()
-    this.state = {
-      editTaskId: null,
-      editLabel: '',
-    }
+  state = {
+    editTaskId: null,
+    editLabel: '',
+  }
 
-    this.textInput = createRef()
+  textInput = createRef()
 
-    this.startEditingTask = (id, label) => {
-      this.setState(
-        {
-          editTaskId: id,
-          editLabel: label,
-        },
-        () => {
-          this.textInput.current.focus()
-        }
-      )
-    }
-    this.editingLabel = (e) => {
-      this.setState({
-        editLabel: e.target.value,
-      })
-    }
-    this.saveEditing = (e) => {
-      if (e.key === 'Enter') {
-        const { editTaskId, editLabel } = this.state
-        if (editTaskId || editTaskId === 0) {
-          this.props.onEditTask(editTaskId, editLabel)
-          this.setState({
-            editTaskId: null,
-            editLabel: '',
-          })
-        }
+  startEditingTask = (id, label) => {
+    this.setState(
+      {
+        editTaskId: id,
+        editLabel: label,
+      },
+      () => {
+        this.textInput.current.focus()
+      }
+    )
+  }
+  editingLabel = (e) => {
+    this.setState({
+      editLabel: e.target.value,
+    })
+  }
+  saveEditing = (e) => {
+    if (e.key === 'Enter') {
+      const { editTaskId, editLabel } = this.state
+      if (editTaskId || editTaskId === 0) {
+        this.props.onEditTask(editTaskId, editLabel)
+        this.setState({
+          editTaskId: null,
+          editLabel: '',
+        })
       }
     }
-  }
-  focusTextInput() {
-    this.textInput.current.focus()
   }
 
   render() {
@@ -63,35 +58,44 @@ export default class TaskList extends Component {
     const { editTaskId, editLabel } = this.state
 
     const elements = todos.map((item) => {
-      const { id, label, min, sec, createDate, completed, show } = item
+      const { id, label, timer, createDate, completed } = item
 
       let classNames = ''
-      if (completed === 'completed') classNames = 'completed'
-      if (show === 'hidden') classNames = 'show'
+      if (completed) classNames = 'completed'
 
       const isEdit = editTaskId === id
       return (
         <li key={id} className={classNames}>
-          {isEdit ? (
-            <input
-              type="text"
-              className="edit"
-              value={editLabel}
-              onChange={this.editingLabel}
-              onKeyDown={this.saveEditing}
-              ref={this.textInput}
-            />
-          ) : (
-            <Task
-              label={label}
-              min={min}
-              sec={sec}
-              createDate={createDate}
-              onDeleted={() => onDeleted(id)}
-              onCompleted={() => onCompleted(id)}
-              onEditTask={() => this.startEditingTask(id, label)}
-            />
-          )}
+          <TimerConsumer>
+            {({ startTimer, stopTimer, timers }) =>
+              isEdit ? (
+                <input
+                  type="text"
+                  className="edit"
+                  value={editLabel}
+                  onChange={this.editingLabel}
+                  onKeyDown={this.saveEditing}
+                  ref={this.textInput}
+                />
+              ) : (
+                <Task
+                  id={id}
+                  label={label}
+                  timer={timer}
+                  // min={min}
+                  // sec={sec}
+                  completed={completed}
+                  createDate={createDate}
+                  onDeleted={() => onDeleted(id)}
+                  onCompleted={() => onCompleted(id)}
+                  onEditTask={() => this.startEditingTask(id, label)}
+                  startTimer={startTimer}
+                  stopTimer={stopTimer}
+                  timers={timers}
+                />
+              )
+            }
+          </TimerConsumer>
         </li>
       )
     })

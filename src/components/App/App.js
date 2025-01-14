@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 
 import './App.css'
+import { TimerProvider } from '../AppContext/AppContext'
 import AppHeader from '../AppHeader/AppHeader'
 import TaskList from '../TaskList/TaskList'
 import Footer from '../Footer/Footer'
@@ -13,16 +14,36 @@ export default class App extends Component {
     filter: 'all',
   }
 
-  createTodoItem(label, min, sec) {
-    return {
-      label,
-      min,
-      sec,
-      completed: 'active',
+  createTask = (label, min, sec) => {
+    const newTask = {
       id: this.newId++,
+      label,
+      completed: false,
       createDate: new Date(),
-      show: 'list-item',
+      timer: { min: min, sec: sec },
+      // min,
+      // sec,
     }
+    this.setState(({ todoData }) => {
+      const newArr = [...todoData, newTask]
+      return {
+        todoData: newArr,
+      }
+    })
+  }
+
+  completedItem = (id) => {
+    this.setState(({ todoData }) => {
+      const newTodoData = todoData.map((elem) => {
+        if (elem.id === id) {
+          return { ...elem, completed: !elem.completed }
+        }
+        return elem
+      })
+      return {
+        todoData: newTodoData,
+      }
+    })
   }
 
   deleteItem = (id) => {
@@ -34,38 +55,11 @@ export default class App extends Component {
     })
   }
 
-  completedItem = (id) => {
-    this.setState(({ todoData }) => {
-      const newTodoData = todoData.map((elem) => {
-        if (elem.id === id) {
-          if (elem.completed === 'active') {
-            return { ...elem, completed: 'completed' }
-          }
-          return { ...elem, completed: 'active' }
-        }
-        return elem
-      })
-      return {
-        todoData: newTodoData,
-      }
-    })
-  }
-
   deleteAll = () => {
     this.setState(({ todoData }) => {
       const newTodoData = todoData.filter((elem) => elem.completed === 'active')
       return {
         todoData: newTodoData,
-      }
-    })
-  }
-
-  newAddTask = (label, min, sec) => {
-    const newTask = this.createTodoItem(label, min, sec)
-    this.setState(({ todoData }) => {
-      const newArr = [...todoData, newTask]
-      return {
-        todoData: newArr,
       }
     })
   }
@@ -83,6 +77,7 @@ export default class App extends Component {
       }
     })
   }
+
   filterTask = (meaning) => {
     this.setState({ filter: meaning })
   }
@@ -90,34 +85,34 @@ export default class App extends Component {
   render() {
     const { todoData, filter } = this.state
 
-    const countUnfinishedTask = todoData.filter((elem) => elem.completed === 'active').length
-    const todoDataFilter = todoData.map((elem) => {
-      if (filter === 'all') {
-        return { ...elem, show: 'list-item' }
-      } else if (filter === 'active' && elem.completed === 'active') {
-        return { ...elem, show: 'list-item' }
-      } else if (filter === 'completed' && elem.completed === 'completed') {
-        return { ...elem, show: 'list-item' }
+    const countUnfinishedTask = todoData.filter((elem) => !elem.completed).length
+    const todoDataFilter = todoData.filter((elem) => {
+      if (filter === 'active') {
+        return !elem.completed
+      } else if (filter === 'completed') {
+        return elem.completed
       } else {
-        return { ...elem, show: 'hidden' }
+        return elem
       }
     })
 
     return (
       <section className="todoApp">
-        <AppHeader onAddTask={this.newAddTask} />
-        <TaskList
-          todos={todoDataFilter}
-          onDeleted={this.deleteItem}
-          onCompleted={this.completedItem}
-          onEditTask={this.editTask}
-        />
-        <Footer
-          onDeletedAll={this.deleteAll}
-          countTasks={countUnfinishedTask}
-          filter={filter}
-          onFilterTask={this.filterTask}
-        />
+        <TimerProvider>
+          <AppHeader onCreateTask={this.createTask} />
+          <TaskList
+            todos={todoDataFilter}
+            onDeleted={this.deleteItem}
+            onCompleted={this.completedItem}
+            onEditTask={this.editTask}
+          />
+          <Footer
+            onDeletedAll={this.deleteAll}
+            countTasks={countUnfinishedTask}
+            filter={filter}
+            onFilterTask={this.filterTask}
+          />
+        </TimerProvider>
       </section>
     )
   }
