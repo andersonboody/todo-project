@@ -21,8 +21,6 @@ export default class App extends Component {
       completed: false,
       createDate: new Date(),
       timer: { min: min, sec: sec },
-      // min,
-      // sec,
     }
     this.setState(({ todoData }) => {
       const newArr = [...todoData, newTask]
